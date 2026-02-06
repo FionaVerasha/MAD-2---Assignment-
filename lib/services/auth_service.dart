@@ -20,41 +20,10 @@ class AuthService {
     return e.response?.data['message'] ?? "An unexpected error occurred";
   }
 
-  Future<User> register({
-    required String name,
-    required String email,
-    required String password,
-    required String passwordConfirmation,
-    String deviceName = 'mobile',
-  }) async {
-    try {
-      final response = await _apiClient.dio.post(
-        '/api/register',
-        data: {
-          'name': name,
-          'email': email,
-          'password': password,
-          'password_confirmation': passwordConfirmation,
-          'device_name': deviceName,
-        },
-      );
-
-      final token = response.data['token'];
-      final user = User.fromJson(response.data['user']);
-
-      await _tokenStorage.saveToken(token);
-      await _userStorage.saveUser(user);
-
-      return user;
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-
   Future<User> login({
     required String email,
     required String password,
-    String deviceName = 'mobile',
+    String deviceName = 'flutter',
   }) async {
     try {
       // 1. Login to get token
