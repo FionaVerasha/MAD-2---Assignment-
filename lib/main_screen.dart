@@ -28,12 +28,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     final cartManager = Provider.of<CartManager>(context);
 
-    final backgroundColor =
-        widget.isDarkMode ? const Color(0xFF121212) : Colors.white;
-    final selectedColor =
-        widget.isDarkMode ? Colors.white : Colors.blueGrey[900];
-    final unselectedColor =
-        widget.isDarkMode ? Colors.grey[400] : Colors.grey[600];
+    final backgroundColor = widget.isDarkMode
+        ? const Color(0xFF121212)
+        : Colors.white;
+    final selectedColor = widget.isDarkMode
+        ? Colors.greenAccent[400]
+        : const Color(0xFF2E7D32);
+    final unselectedColor = widget.isDarkMode
+        ? Colors.grey[400]
+        : Colors.grey[600];
 
     // All pages with dark mode + toggle passed
     final List<Widget> pagesList = [
@@ -70,8 +73,9 @@ class _MainScreenState extends State<MainScreen> {
             _selectedIndex = index;
           });
         },
-        backgroundColor:
-            widget.isDarkMode ? const Color(0xFF2C2C2C) : Colors.white,
+        backgroundColor: widget.isDarkMode
+            ? const Color(0xFF2C2C2C)
+            : Colors.white,
         selectedItemColor: selectedColor,
         unselectedItemColor: unselectedColor,
         type: BottomNavigationBarType.fixed,

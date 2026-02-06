@@ -30,16 +30,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartManager>(context);
-    final backgroundColor =
-        isDarkMode ? const Color(0xFF121212) : Colors.grey[300];
+    final backgroundColor = isDarkMode
+        ? const Color(0xFF121212)
+        : Colors.grey[300];
     final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final cardColor =
-        isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
-    final accentColor =
-        isDarkMode ? Colors.tealAccent[700]! : const Color(0xFF779FB5);
+    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
+    final accentColor = isDarkMode
+        ? Colors.tealAccent[700]!
+        : const Color(0xFF779FB5);
     final appBarColor = isDarkMode
-        ? const Color(0xFF2C2C2C)
-        : const Color.fromARGB(255, 52, 68, 122);
+        ? const Color(0xFF1B5E20)
+        : const Color(0xFF2E7D32);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -48,10 +49,7 @@ class _HomePageState extends State<HomePage> {
         elevation: 3,
         title: const Text(
           "Whisker Cart",
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
@@ -68,8 +66,10 @@ class _HomePageState extends State<HomePage> {
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined,
-                    color: Colors.white),
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  color: Colors.white,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -99,10 +99,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Text(
                       cart.totalItems.toString(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                      ),
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
                     ),
                   ),
                 ),
@@ -143,8 +140,7 @@ class _HomePageState extends State<HomePage> {
                       // ignore: deprecated_member_use
                       ? Colors.black.withOpacity(0.6)
                       : null,
-                  colorBlendMode:
-                      isDarkMode ? BlendMode.darken : null,
+                  colorBlendMode: isDarkMode ? BlendMode.darken : null,
                 ),
                 Positioned.fill(
                   child: Center(
@@ -162,17 +158,16 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(height: 10),
                         Text(
                           "Shop for your furry friend with ease",
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 18,
-                          ),
+                          style: TextStyle(color: textColor, fontSize: 18),
                         ),
                         const SizedBox(height: 15),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: accentColor,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 12),
+                              horizontal: 30,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
@@ -204,14 +199,30 @@ class _HomePageState extends State<HomePage> {
                   ? const Color(0xFF2C2C2C)
                   : const Color.fromARGB(255, 170, 175, 190),
               children: [
-                categoryCard("Dogs", "assets/images/dogs.png",
-                    cardColor, textColor),
-                categoryCard("Cats", "assets/images/cats.png",
-                    cardColor, textColor),
-                categoryCard("Accessories",
-                    "assets/images/accessories.png", cardColor, textColor),
-                categoryCard("Grooming",
-                    "assets/images/grooming.png", cardColor, textColor),
+                categoryCard(
+                  "Dogs",
+                  "assets/images/dogs.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Cats",
+                  "assets/images/cats.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Accessories",
+                  "assets/images/accessories.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Grooming",
+                  "assets/images/grooming.png",
+                  cardColor,
+                  textColor,
+                ),
               ],
             ),
 
@@ -222,10 +233,30 @@ class _HomePageState extends State<HomePage> {
                   ? const Color(0xFF252525)
                   : const Color.fromARGB(255, 153, 172, 185),
               children: [
-                categoryCard("Premium Dog Collar","assets/images/collars.png", cardColor, textColor),
-                categoryCard("Cat Scratching Post","assets/images/scratchingpost.png", cardColor, textColor),
-                categoryCard("Luxury Pet Bed","assets/images/petbed.png", cardColor, textColor),
-                categoryCard("Interactive Toy","assets/images/toys.png", cardColor, textColor),
+                categoryCard(
+                  "Premium Dog Collar",
+                  "assets/images/collars.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Cat Scratching Post",
+                  "assets/images/scratchingpost.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Luxury Pet Bed",
+                  "assets/images/petbed.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Interactive Toy",
+                  "assets/images/toys.png",
+                  cardColor,
+                  textColor,
+                ),
               ],
             ),
 
@@ -236,10 +267,30 @@ class _HomePageState extends State<HomePage> {
                   ? const Color(0xFF1E1E1E)
                   : const Color.fromARGB(255, 84, 102, 137),
               children: [
-                categoryCard("Automatic Feeder","assets/images/new1.png", cardColor, textColor),
-                categoryCard("Cat Backpack","assets/images/new2.png", cardColor, textColor),
-                categoryCard("Pet Dryer","assets/images/new3.png", cardColor, textColor),
-                categoryCard("Pet Water Fountain","assets/images/new4.png", cardColor, textColor),
+                categoryCard(
+                  "Automatic Feeder",
+                  "assets/images/new1.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Cat Backpack",
+                  "assets/images/new2.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Pet Dryer",
+                  "assets/images/new3.png",
+                  cardColor,
+                  textColor,
+                ),
+                categoryCard(
+                  "Pet Water Fountain",
+                  "assets/images/new4.png",
+                  cardColor,
+                  textColor,
+                ),
               ],
             ),
           ],
@@ -250,7 +301,11 @@ class _HomePageState extends State<HomePage> {
 
   //Category Card Widget
   Widget categoryCard(
-      String title, String imagePath, Color cardColor, Color textColor) {
+    String title,
+    String imagePath,
+    Color cardColor,
+    Color textColor,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: cardColor,
@@ -332,12 +387,15 @@ class _HomePageState extends State<HomePage> {
 //Simple Search Delegate
 class _DummySearchDelegate extends SearchDelegate<String> {
   @override
-  List<Widget> buildActions(BuildContext context) =>
-      [IconButton(icon: const Icon(Icons.clear), onPressed: () => query = '')];
+  List<Widget> buildActions(BuildContext context) => [
+    IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
+  ];
 
   @override
-  Widget buildLeading(BuildContext context) =>
-      IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => close(context, ''));
+  Widget buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, ''),
+  );
 
   @override
   Widget buildResults(BuildContext context) =>

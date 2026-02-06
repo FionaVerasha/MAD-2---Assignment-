@@ -3,16 +3,21 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'cart_manager.dart';
+import 'providers/auth_provider.dart';
 import 'login_page.dart';
 import 'main_screen.dart';
 import 'about_us_page.dart';
+import 'landing_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => CartManager(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartManager()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -59,22 +64,15 @@ class _MyAppState extends State<MyApp> {
       darkTheme: _darkTheme(),
 
       // Handles login and routing logic
-      home: _AuthGate(
-        onToggleTheme: _toggleTheme,
-        isDarkMode: _isDarkMode,
-      ),
+      home: _AuthGate(onToggleTheme: _toggleTheme, isDarkMode: _isDarkMode),
 
       // Named routes
       routes: {
         '/login': (_) => const LoginPage(),
-        '/main': (_) => MainScreen(
-              onToggleTheme: _toggleTheme,
-              isDarkMode: _isDarkMode,
-            ),
-        '/about': (_) => AboutUsPage(
-              isDarkMode: _isDarkMode,
-              onToggleTheme: _toggleTheme,
-            ),
+        '/main': (_) =>
+            MainScreen(onToggleTheme: _toggleTheme, isDarkMode: _isDarkMode),
+        '/about': (_) =>
+            AboutUsPage(isDarkMode: _isDarkMode, onToggleTheme: _toggleTheme),
       },
     );
   }
@@ -83,12 +81,14 @@ class _MyAppState extends State<MyApp> {
   ThemeData _lightTheme() {
     return ThemeData(
       brightness: Brightness.light,
-      scaffoldBackgroundColor: Colors.grey[200],
+      scaffoldBackgroundColor: const Color(
+        0xFFF1F8E9,
+      ), // Light green background
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color.fromARGB(255, 52, 68, 122),
+        backgroundColor: Color(0xFF2E7D32), // Dark green
         foregroundColor: Colors.white,
       ),
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueGrey),
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
     );
   }
 
@@ -96,65 +96,42 @@ class _MyAppState extends State<MyApp> {
   ThemeData _darkTheme() {
     return ThemeData(
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF121212),
+      scaffoldBackgroundColor: const Color(0xFF1B5E20), // Very dark green
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF2C2C2C),
+        backgroundColor: Color(0xFF1B5E20),
         foregroundColor: Colors.white,
       ),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: Colors.blueGrey,
+        seedColor: Colors.green,
         brightness: Brightness.dark,
       ),
     );
   }
 }
 
-class _AuthGate extends StatefulWidget {
+class _AuthGate extends StatelessWidget {
   final Function(bool) onToggleTheme;
   final bool isDarkMode;
 
-  const _AuthGate({
-    required this.onToggleTheme,
-    required this.isDarkMode,
-  });
-
-  @override
-  State<_AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<_AuthGate> {
-  late final Future<bool> _isLoggedInFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _isLoggedInFuture = _checkLoginStatus();
-  }
-
-  Future<bool> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('isLoggedIn') ?? false;
-  }
+  const _AuthGate({required this.onToggleTheme, required this.isDarkMode});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<bool>(
-      future: _isLoggedInFuture,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+    final auth = Provider.of<AuthProvider>(context);
 
-        final isLoggedIn = snapshot.data ?? false;
-        return isLoggedIn
-            ? MainScreen(
-                onToggleTheme: widget.onToggleTheme,
-                isDarkMode: widget.isDarkMode,
-              )
-            : const LoginPage();
-      },
-    );
+    if (auth.status == AuthStatus.loading ||
+        auth.status == AuthStatus.unknown) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
+        ),
+      );
+    }
+
+    if (auth.status == AuthStatus.authenticated) {
+      return MainScreen(onToggleTheme: onToggleTheme, isDarkMode: isDarkMode);
+    }
+
+    return const LandingPage();
   }
 }

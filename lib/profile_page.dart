@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'login_page.dart';
+import 'package:provider/provider.dart';
+import 'providers/auth_provider.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isDarkMode;
@@ -17,44 +17,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String email = "";
-  String username = "";
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
-
-  Future<void> _loadUserData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      email = prefs.getString('user_email') ?? "";
-      username = prefs.getString('user_name') ?? "User";
-    });
-  }
-
-  Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      // ignore: use_build_context_synchronously
-      context,
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final backgroundColor =
-        widget.isDarkMode ? const Color(0xFF121212) : Colors.grey[200];
+    final auth = Provider.of<AuthProvider>(context);
+    final user = auth.currentUser;
+
+    final backgroundColor = widget.isDarkMode
+        ? const Color(0xFF1B5E20)
+        : Colors.grey[200];
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-    final subTextColor =
-        widget.isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
+    final subTextColor = widget.isDarkMode
+        ? Colors.grey[400]!
+        : Colors.grey[600]!;
     final appBarColor = widget.isDarkMode
-        ? const Color(0xFF2C2C2C)
-        : const Color.fromARGB(255, 93, 107, 152);
+        ? const Color(0xFF1B5E20)
+        : const Color(0xFF2E7D32);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -63,15 +40,11 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: appBarColor,
         centerTitle: true,
         actions: [
-          // Theme toggle button
           IconButton(
             icon: Icon(
               widget.isDarkMode ? Icons.dark_mode : Icons.light_mode,
               color: Colors.white,
             ),
-            tooltip: widget.isDarkMode
-                ? "Switch to Light Mode"
-                : "Switch to Dark Mode",
             onPressed: () => widget.onToggleTheme(!widget.isDarkMode),
           ),
         ],
@@ -86,10 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundImage: AssetImage('assets/images/logo.png'),
             ),
             const SizedBox(height: 20),
-
-            // Display registered username
             Text(
-              username.isNotEmpty ? username : "User",
+              user?.name ?? "User",
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
@@ -97,22 +68,15 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 10),
-
-            // Display registered email
             Text(
-              email.isNotEmpty ? email : "Loading email...",
-              style: TextStyle(
-                fontSize: 16,
-                color: subTextColor,
-              ),
+              user?.email ?? "No email",
+              style: TextStyle(fontSize: 16, color: subTextColor),
             ),
             const SizedBox(height: 30),
-
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text("Edit profile coming soon!")),
+                  const SnackBar(content: Text("Edit profile coming soon!")),
                 );
               },
               icon: const Icon(Icons.edit),
@@ -125,14 +89,14 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 20),
-
             ElevatedButton.icon(
-              onPressed: () => _logout(context),
+              onPressed: () => auth.logout(),
               icon: const Icon(Icons.logout),
               label: const Text("Logout"),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 minimumSize: const Size(double.infinity, 50),
+                foregroundColor: Colors.white,
               ),
             ),
           ],
