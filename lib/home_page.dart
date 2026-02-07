@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'category_page.dart';
+import 'shop_page.dart';
 import 'cart_page.dart' as pages;
 import 'cart_manager.dart';
+import 'providers/product_provider.dart';
+import 'models/product.dart';
+import 'productdetail_page.dart';
+import 'widgets/product_image.dart';
 
 class HomePage extends StatefulWidget {
   final bool isDarkMode;
@@ -25,19 +29,25 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     isDarkMode = widget.isDarkMode;
+    // Load products on start
+    Future.microtask(() {
+      if (!mounted) return;
+      Provider.of<ProductProvider>(context, listen: false).loadProducts();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final cart = Provider.of<CartManager>(context);
+    final productProvider = Provider.of<ProductProvider>(context);
+
     final backgroundColor = isDarkMode
         ? const Color(0xFF121212)
         : Colors.grey[300];
     final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
     final accentColor = isDarkMode
         ? Colors.tealAccent[700]!
-        : const Color(0xFF779FB5);
+        : const Color(0xFF2E7D32);
     final appBarColor = isDarkMode
         ? const Color(0xFF1B5E20)
         : const Color(0xFF2E7D32);
@@ -53,15 +63,20 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
         actions: [
-          //Search
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
-              showSearch(context: context, delegate: _DummySearchDelegate());
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ShopPage(
+                    isDarkMode: isDarkMode,
+                    onToggleTheme: widget.onToggleTheme,
+                  ),
+                ),
+              );
             },
           ),
-
-          //Cart
           Stack(
             alignment: Alignment.center,
             children: [
@@ -77,9 +92,7 @@ class _HomePageState extends State<HomePage> {
                       builder: (_) => pages.CartPage(
                         isDarkMode: isDarkMode,
                         onToggleTheme: (value) {
-                          setState(() {
-                            isDarkMode = value;
-                          });
+                          setState(() => isDarkMode = value);
                           widget.onToggleTheme(value);
                         },
                       ),
@@ -105,16 +118,11 @@ class _HomePageState extends State<HomePage> {
                 ),
             ],
           ),
-
-          //Theme Toggle
           IconButton(
             icon: Icon(
               isDarkMode ? Icons.light_mode : Icons.dark_mode,
               color: Colors.white,
             ),
-            tooltip: isDarkMode
-                ? "Switch to Light Mode"
-                : "Switch to Dark Mode",
             onPressed: () {
               setState(() => isDarkMode = !isDarkMode);
               widget.onToggleTheme(isDarkMode);
@@ -122,176 +130,28 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-
-      //Body Content
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //Hero Section
-            Stack(
-              children: [
-                Image.asset(
-                  'assets/images/main.jpg',
-                  width: double.infinity,
-                  height: 220,
-                  fit: BoxFit.cover,
-                  color: isDarkMode
-                      // ignore: deprecated_member_use
-                      ? Colors.black.withOpacity(0.6)
-                      : null,
-                  colorBlendMode: isDarkMode ? BlendMode.darken : null,
-                ),
-                Positioned.fill(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Find the Best Pet Products",
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Shop for your furry friend with ease",
-                          style: TextStyle(color: textColor, fontSize: 18),
-                        ),
-                        const SizedBox(height: 15),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: accentColor,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 30,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CategoryPage(
-                                  isDarkMode: isDarkMode,
-                                  onToggleTheme: widget.onToggleTheme,
-                                ),
-                              ),
-                            );
-                          },
-                          child: const Text("Shop Now"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+            // Hero Section
+            _buildHero(textColor, accentColor),
+
+            // Best Sellers (From API)
+            _buildProductSection(
+              "Best Sellers",
+              productProvider.products.take(4).toList(),
+              productProvider.isLoading,
             ),
 
-            //Featured Categories
-            buildSection(
-              title: "Featured Categories",
-              backgroundColor: isDarkMode
-                  ? const Color(0xFF2C2C2C)
-                  : const Color.fromARGB(255, 170, 175, 190),
-              children: [
-                categoryCard(
-                  "Dogs",
-                  "assets/images/dogs.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Cats",
-                  "assets/images/cats.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Accessories",
-                  "assets/images/accessories.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Grooming",
-                  "assets/images/grooming.png",
-                  cardColor,
-                  textColor,
-                ),
-              ],
-            ),
+            // Categories (Statics)
+            _buildCategorySection(),
 
-            //Best Sellers
-            buildSection(
-              title: "Best Sellers",
-              backgroundColor: isDarkMode
-                  ? const Color(0xFF252525)
-                  : const Color.fromARGB(255, 153, 172, 185),
-              children: [
-                categoryCard(
-                  "Premium Dog Collar",
-                  "assets/images/collars.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Cat Scratching Post",
-                  "assets/images/scratchingpost.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Luxury Pet Bed",
-                  "assets/images/petbed.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Interactive Toy",
-                  "assets/images/toys.png",
-                  cardColor,
-                  textColor,
-                ),
-              ],
-            ),
-
-            //New Arrivals
-            buildSection(
-              title: "New Arrivals",
-              backgroundColor: isDarkMode
-                  ? const Color(0xFF1E1E1E)
-                  : const Color.fromARGB(255, 84, 102, 137),
-              children: [
-                categoryCard(
-                  "Automatic Feeder",
-                  "assets/images/new1.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Cat Backpack",
-                  "assets/images/new2.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Pet Dryer",
-                  "assets/images/new3.png",
-                  cardColor,
-                  textColor,
-                ),
-                categoryCard(
-                  "Pet Water Fountain",
-                  "assets/images/new4.png",
-                  cardColor,
-                  textColor,
-                ),
-              ],
+            // New Arrivals (From API)
+            _buildProductSection(
+              "New Arrivals",
+              productProvider.products.reversed.take(4).toList(),
+              productProvider.isLoading,
             ),
           ],
         ),
@@ -299,46 +159,241 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  //Category Card Widget
-  Widget categoryCard(
-    String title,
-    String imagePath,
-    Color cardColor,
-    Color textColor,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: Image.asset(
-              imagePath,
-              height: 200, // 🔹 Fixed height
-              width: double.infinity,
-              fit: BoxFit.cover,
+  Widget _buildHero(Color textColor, Color accentColor) {
+    return Stack(
+      children: [
+        Image.asset(
+          'assets/images/main.jpg',
+          width: double.infinity,
+          height: 220,
+          fit: BoxFit.cover,
+          color: isDarkMode ? Colors.black.withOpacity(0.6) : null,
+          colorBlendMode: isDarkMode ? BlendMode.darken : null,
+        ),
+        Positioned.fill(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Find the Best Pet Products",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Shop for your furry friend with ease",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+                const SizedBox(height: 15),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 12,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ShopPage(
+                          isDarkMode: isDarkMode,
+                          onToggleTheme: widget.onToggleTheme,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Shop Now",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Center(
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductSection(
+    String title,
+    List<Product> products,
+    bool isLoading,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 15),
+          if (isLoading)
+            const Center(
+              child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
+            )
+          else if (products.isEmpty)
+            Center(
               child: Text(
-                title,
-                textAlign: TextAlign.center,
+                "No products available",
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
+                  color: isDarkMode ? Colors.grey : Colors.black54,
+                ),
+              ),
+            )
+          else
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.75,
+              ),
+              itemCount: products.length,
+              itemBuilder: (context, index) =>
+                  _buildProductCard(products[index]),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProductCard(Product product) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              ProductDetailPage(product: product, isDarkMode: isDarkMode),
+        ),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
+                child: ProductImage(url: product.imageUrl, fit: BoxFit.cover),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  Text(
+                    "Rs. ${product.price.toStringAsFixed(2)}",
+                    style: const TextStyle(
+                      color: Color(0xFF2E7D32),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategorySection() {
+    final categories = [
+      {"name": "Dogs", "image": "assets/images/dogs.png"},
+      {"name": "Cats", "image": "assets/images/cats.png"},
+      {"name": "Accessories", "image": "assets/images/accessories.png"},
+      {"name": "Grooming", "image": "assets/images/grooming.png"},
+    ];
+
+    return Container(
+      color: isDarkMode
+          ? const Color(0xFF2C2C2C)
+          : const Color.fromARGB(255, 232, 234, 246),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Featured Categories",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 15),
+          SizedBox(
+            height: 120,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: categories.length,
+              itemBuilder: (context, index) => GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ShopPage(
+                      isDarkMode: isDarkMode,
+                      onToggleTheme: widget.onToggleTheme,
+                    ),
+                  ),
+                ),
+                child: Container(
+                  width: 100,
+                  margin: const EdgeInsets.only(right: 15),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundImage: AssetImage(
+                          categories[index]["image"]!,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        categories[index]["name"]!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -347,61 +402,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  //Section Builder Widget
-  Widget buildSection({
-    required String title,
-    required Color backgroundColor,
-    required List<Widget> children,
-  }) {
-    return Container(
-      color: backgroundColor,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 10),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-            childAspectRatio: 0.9, // Adjusted for 200px image height
-            children: children,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-//Simple Search Delegate
-class _DummySearchDelegate extends SearchDelegate<String> {
-  @override
-  List<Widget> buildActions(BuildContext context) => [
-    IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ''),
-  ];
-
-  @override
-  Widget buildLeading(BuildContext context) => IconButton(
-    icon: const Icon(Icons.arrow_back),
-    onPressed: () => close(context, ''),
-  );
-
-  @override
-  Widget buildResults(BuildContext context) =>
-      Center(child: Text("Search results for \"$query\""));
-
-  @override
-  Widget buildSuggestions(BuildContext context) =>
-      const Center(child: Text("Search for products..."));
 }

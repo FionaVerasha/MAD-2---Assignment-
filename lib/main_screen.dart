@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'cart_manager.dart';
 import 'cart_page.dart' as pages;
 import 'home_page.dart';
-import 'category_page.dart';
+import 'shop_page.dart';
 import 'about_us_page.dart';
 import 'profile_page.dart';
 
@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
         isDarkMode: widget.isDarkMode,
         onToggleTheme: widget.onToggleTheme,
       ),
-      CategoryPage(
+      ShopPage(
         isDarkMode: widget.isDarkMode,
         onToggleTheme: widget.onToggleTheme,
       ),
@@ -85,8 +85,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Home',
           ),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.pets_outlined),
-            label: 'Categories',
+            icon: Icon(Icons.shopping_bag_outlined),
+            label: 'Shop',
           ),
           BottomNavigationBarItem(
             icon: Stack(

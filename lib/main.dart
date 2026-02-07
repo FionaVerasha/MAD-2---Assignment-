@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'cart_manager.dart';
 import 'providers/auth_provider.dart';
+import 'providers/product_provider.dart';
 import 'login_page.dart';
 import 'main_screen.dart';
 import 'about_us_page.dart';
@@ -17,6 +18,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => CartManager()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: const MyApp(),
     ),
@@ -131,7 +133,6 @@ class _AuthGate extends StatelessWidget {
     if (auth.status == AuthStatus.authenticated) {
       return MainScreen(onToggleTheme: onToggleTheme, isDarkMode: isDarkMode);
     }
-
     return const LandingPage();
   }
 }
