@@ -277,8 +277,11 @@ class _HomePageState extends State<HomePage> {
       onTap: () => Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              ProductDetailPage(product: product, isDarkMode: isDarkMode),
+          builder: (_) => ProductDetailPage(
+            product: product,
+            isDarkMode: isDarkMode,
+            onToggleTheme: widget.onToggleTheme,
+          ),
         ),
       ),
       child: Container(
@@ -296,11 +299,36 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(10),
-                ),
-                child: ProductImage(url: product.imageUrl, fit: BoxFit.cover),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: ProductImage(
+                        url: product.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductDetailPage(
+                              product: product,
+                              isDarkMode: isDarkMode,
+                              onToggleTheme: widget.onToggleTheme,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'cart_manager.dart';
-import 'checkout_page.dart';
+import 'shipping_address_page.dart';
 import 'widgets/product_image.dart';
 
 class CartPage extends StatelessWidget {
@@ -20,24 +20,24 @@ class CartPage extends StatelessWidget {
 
     //Dark mode colors
     final backgroundColor = isDarkMode
-        ? const Color(0xFF121212)
-        : Colors.grey[200];
+        ? const Color(0xFF1B5E20)
+        : const Color(0xFFF1F8E9);
     final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final accentColor = isDarkMode
-        ? Colors.tealAccent[700]!
-        : const Color(0xFF707C82);
+        ? Colors.greenAccent[700]!
+        : const Color(0xFF2E7D32);
     final appBarColor = isDarkMode
-        ? const Color(0xFF2C2C2C)
-        : const Color(0xFFADBFC8);
+        ? const Color(0xFF1B5E20)
+        : const Color(0xFF2E7D32);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           "Your Cart",
-          style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black,
+          style: const TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -67,6 +67,10 @@ class CartPage extends StatelessWidget {
             )
           : Column(
               children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: _buildStepper(),
+                ),
                 Expanded(
                   child: ListView.builder(
                     itemCount: cartManager.items.length,
@@ -104,6 +108,16 @@ class CartPage extends StatelessWidget {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: textColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "Size: ${item.size}",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDarkMode
+                                            ? Colors.white70
+                                            : Colors.grey[600],
                                       ),
                                     ),
                                     const SizedBox(height: 5),
@@ -223,7 +237,7 @@ class CartPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => CheckoutPage(
+                            builder: (_) => ShippingAddressPage(
                               isDarkMode: isDarkMode,
                               onToggleTheme: onToggleTheme,
                             ),
@@ -232,7 +246,7 @@ class CartPage extends StatelessWidget {
                       }
                     },
                     child: Text(
-                      "Checkout",
+                      "Proceed to Checkout",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -243,6 +257,66 @@ class CartPage extends StatelessWidget {
                 ),
               ],
             ),
+    );
+  }
+
+  Widget _buildStepper() {
+    return Row(
+      children: [
+        _buildStep("Review", true, false),
+        _buildLine(false),
+        _buildStep("Address", false, false),
+        _buildLine(false),
+        _buildStep("Confirm", false, false),
+      ],
+    );
+  }
+
+  Widget _buildStep(String label, bool isActive, bool isComplete) {
+    return Column(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: isComplete
+                ? const Color(0xFF2E7D32)
+                : (isActive ? const Color(0xFF2E7D32) : Colors.grey[300]),
+            shape: BoxShape.circle,
+          ),
+          child: isComplete
+              ? const Icon(Icons.check, size: 16, color: Colors.white)
+              : Center(
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: isActive ? const Color(0xFF2E7D32) : Colors.grey,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLine(bool isActive) {
+    return Expanded(
+      child: Container(
+        height: 2,
+        color: isActive ? const Color(0xFF2E7D32) : Colors.grey[300],
+        margin: const EdgeInsets.only(bottom: 20),
+      ),
     );
   }
 }

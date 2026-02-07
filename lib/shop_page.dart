@@ -5,6 +5,7 @@ import 'providers/product_provider.dart';
 import 'models/product.dart';
 import 'productdetail_page.dart';
 import 'widgets/product_image.dart';
+import 'widgets/cart_icon_button.dart';
 
 class ShopPage extends StatefulWidget {
   final bool isDarkMode;
@@ -58,6 +59,10 @@ class _ShopPageState extends State<ShopPage> {
         ),
         centerTitle: true,
         actions: [
+          CartIconButton(
+            isDarkMode: widget.isDarkMode,
+            onToggleTheme: widget.onToggleTheme,
+          ),
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: () => productProvider.loadProducts(),
@@ -126,6 +131,7 @@ class _ShopPageState extends State<ShopPage> {
       return const Center(child: Text("No products found."));
     }
 
+    // MAD2 Requirement: Scrollable Master List using GridView.builder
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -147,12 +153,14 @@ class _ShopPageState extends State<ShopPage> {
 
     return GestureDetector(
       onTap: () {
+        // MAD2 Requirement: Navigate from Master (List) to Detail View
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ProductDetailPage(
               product: product,
               isDarkMode: widget.isDarkMode,
+              onToggleTheme: widget.onToggleTheme,
             ),
           ),
         );
@@ -173,9 +181,39 @@ class _ShopPageState extends State<ShopPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                child: ProductImage(url: product.imageUrl, fit: BoxFit.cover),
+              child: Stack(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    width: double.infinity,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: ProductImage(
+                        url: product.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProductDetailPage(
+                                product: product,
+                                isDarkMode: widget.isDarkMode,
+                                onToggleTheme: widget.onToggleTheme,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -211,10 +249,12 @@ class _ShopPageState extends State<ShopPage> {
                 height: 35,
                 child: ElevatedButton(
                   onPressed: () {
+                    // Action for Add to Cart only
                     cart.addToCart(
                       CartItem(
                         name: product.name,
                         image: product.imageUrl,
+                        size: "12.5kg", // Default size for grid items
                         price: product.price,
                       ),
                     );

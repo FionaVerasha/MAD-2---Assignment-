@@ -20,7 +20,8 @@ Widget getPlatformProductImage({
       ..src = url
       ..style.width = '100%'
       ..style.height = '100%'
-      ..style.objectFit = 'cover'
+      ..style.objectFit = fit == BoxFit.contain ? 'contain' : 'cover'
+      ..style.pointerEvents = 'none'
       ..setAttribute('loading', 'lazy');
 
     img.onError.listen((_) {

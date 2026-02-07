@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class CartItem {
   final String name;
   final String image;
+  final String size; // MAD2 Requirement: track selected variant size
   double price;
   int quantity;
 
   CartItem({
     required this.name,
     required this.image,
+    required this.size,
     required this.price,
     this.quantity = 1,
   });
@@ -24,14 +26,17 @@ class CartManager extends ChangeNotifier {
 
   //  Add an item to the cart (keeps correct price and prevents duplicates)
   void addToCart(CartItem item) {
-    final existingIndex = _items.indexWhere((i) => i.name == item.name);
+    // Check for existing item with SAME name AND SAME size
+    final existingIndex = _items.indexWhere(
+      (i) => i.name == item.name && i.size == item.size,
+    );
 
     if (existingIndex >= 0) {
-      // If item already exists, increase quantity and keep latest price
-      _items[existingIndex].quantity++;
+      // If item already exists, increase quantity
+      _items[existingIndex].quantity += item.quantity;
+      // We keep the price from the new item in case it changed
       _items[existingIndex].price = item.price;
     } else {
-      
       _items.add(item);
     }
 

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'cart_manager.dart';
-import 'cart_page.dart' as pages;
 import 'home_page.dart';
 import 'shop_page.dart';
 import 'about_us_page.dart';
@@ -26,8 +23,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cartManager = Provider.of<CartManager>(context);
-
     final backgroundColor = widget.isDarkMode
         ? const Color(0xFF121212)
         : Colors.white;
@@ -45,10 +40,6 @@ class _MainScreenState extends State<MainScreen> {
         onToggleTheme: widget.onToggleTheme,
       ),
       ShopPage(
-        isDarkMode: widget.isDarkMode,
-        onToggleTheme: widget.onToggleTheme,
-      ),
-      pages.CartPage(
         isDarkMode: widget.isDarkMode,
         onToggleTheme: widget.onToggleTheme,
       ),
@@ -87,35 +78,6 @@ class _MainScreenState extends State<MainScreen> {
           const BottomNavigationBarItem(
             icon: Icon(Icons.shopping_bag_outlined),
             label: 'Shop',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Icon(Icons.shopping_cart_outlined),
-                if (cartManager.totalItems > 0)
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        color: Colors.redAccent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        cartManager.totalItems.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            label: 'Cart',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.info_outline),

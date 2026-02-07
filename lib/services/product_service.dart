@@ -5,6 +5,7 @@ import 'api_client.dart';
 class ProductService {
   final ApiClient _apiClient = ApiClient();
 
+  // MAD2 Requirement: Fetching data from an external JSON source (SSP2 Backend)
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await _apiClient.dio.get('/api/products');

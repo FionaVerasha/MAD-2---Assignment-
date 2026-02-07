@@ -1,5 +1,6 @@
 import '../utils/url_utils.dart';
 
+// MAD2 Requirement: Product model parsed from external JSON
 class Product {
   final int id;
   final String name;
