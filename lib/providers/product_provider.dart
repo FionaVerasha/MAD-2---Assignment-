@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/product.dart';
-import '../services/product_service.dart';
+import '../controllers/product_controller.dart';
 
 class ProductProvider extends ChangeNotifier {
-  final ProductService _productService = ProductService();
+  final ProductController _productController = ProductController();
 
   List<Product> _products = [];
   bool _isLoading = false;
@@ -19,7 +19,7 @@ class ProductProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _products = await _productService.fetchProducts();
+      _products = await _productController.fetchProducts();
 
       // Debug logging for first 5 products
       for (var i = 0; i < _products.length && i < 5; i++) {

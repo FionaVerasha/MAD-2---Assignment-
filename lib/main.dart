@@ -10,6 +10,8 @@ import 'login_page.dart';
 import 'main_screen.dart';
 import 'about_us_page.dart';
 import 'landing_page.dart';
+import 'controllers/product_controller.dart';
+import 'controllers/order_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +23,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
+        Provider(create: (_) => ProductController()),
+        Provider(create: (_) => OrderController()),
       ],
       child: const MyApp(),
     ),
@@ -62,7 +66,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Whisker Cart',
+      title: 'Whisker Cart ANDROID',
       themeMode: _isDarkMode ? ThemeMode.dark : ThemeMode.light,
       theme: _lightTheme(),
       darkTheme: _darkTheme(),

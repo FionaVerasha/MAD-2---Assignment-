@@ -7,6 +7,7 @@ import 'productdetail_page.dart';
 import 'widgets/product_image.dart';
 import 'widgets/brand_logo.dart';
 import 'widgets/category_drawer.dart';
+import 'controllers/product_controller.dart';
 import 'cart_page.dart' as pages;
 
 class ShopPage extends StatefulWidget {
@@ -41,14 +42,14 @@ class _ShopPageState extends State<ShopPage> {
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
-    final filteredProducts = productProvider.products.where((p) {
-      final matchesSearch = p.name.toLowerCase().contains(
-        searchQuery.toLowerCase(),
-      );
-      final matchesCategory =
-          selectedCategory == "all" || p.category == selectedCategory;
-      return matchesSearch && matchesCategory;
-    }).toList();
+    final productController = Provider.of<ProductController>(context);
+
+    // Use controller for filtering
+    final filteredProducts = productController.filterProducts(
+      productProvider.products,
+      selectedCategory,
+      searchQuery,
+    );
 
     final backgroundColor = widget.isDarkMode
         ? const Color(0xFF121212)
@@ -292,7 +293,7 @@ class _ShopPageState extends State<ShopPage> {
             Text(
               "Rs. ${product.price.toStringAsFixed(2)}",
               style: const TextStyle(
-                color: Color(0xFF22C55E),
+                color: Color(0xFF1B9E4B),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -318,13 +319,13 @@ class _ShopPageState extends State<ShopPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("${product.name} added to cart!"),
-                        backgroundColor: const Color(0xFF22C55E),
+                        backgroundColor: const Color(0xFF1B9E4B),
                         duration: const Duration(seconds: 1),
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF22C55E),
+                    backgroundColor: const Color(0xFF1B9E4B),
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(

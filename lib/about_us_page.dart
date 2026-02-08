@@ -145,7 +145,7 @@ class AboutUsPage extends StatelessWidget {
             return Container(
               color: Colors.grey[200],
               child: const Center(
-                child: CircularProgressIndicator(color: Color(0xFF22C55E)),
+                child: CircularProgressIndicator(color: Color(0xFF1B9E4B)),
               ),
             );
           },
@@ -168,7 +168,7 @@ class AboutUsPage extends StatelessWidget {
     Color textColor,
     Color subTextColor,
   ) {
-    const greenColor = Color(0xFF22C55E);
+    const greenColor = Color(0xFF1B9E4B);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

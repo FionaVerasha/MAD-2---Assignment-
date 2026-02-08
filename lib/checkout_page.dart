@@ -6,6 +6,8 @@ import 'models/payment_method.dart';
 import 'payment_page.dart';
 import 'models/checkout_snapshot.dart';
 import 'services/checkout_storage.dart';
+import 'controllers/order_controller.dart';
+import 'models/order.dart' as models;
 import 'widgets/brand_logo.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -288,12 +290,29 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   );
                 } else {
                   // COD or Bank Deposit flow
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Order Placed Successfully!"),
-                      backgroundColor: Color(0xFF028A2B),
-                    ),
+                  // Save order to history using MVC Controller
+                  final orderController = Provider.of<OrderController>(
+                    context,
+                    listen: false,
                   );
+                  final order = models.Order(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    items: items,
+                    totalAmount: totalPrice,
+                    address: address,
+                    paymentMethod: checkoutProvider.selectedPaymentMethod.name,
+                    timestamp: DateTime.now(),
+                  );
+                  await orderController.saveOrder(order);
+
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Order Placed Successfully!"),
+                        backgroundColor: Color(0xFF028A2B),
+                      ),
+                    );
+                  }
 
                   // Cleanup
                   await CheckoutStorage().clearSnapshot();

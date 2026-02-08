@@ -47,5 +47,16 @@ class Product {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'image': image,
+      'category': category,
+    };
+  }
+
   String get imageUrl => resolveImageUrl(image);
 }

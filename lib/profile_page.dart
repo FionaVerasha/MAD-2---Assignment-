@@ -8,6 +8,7 @@ import 'network_status_page.dart';
 import 'battery_status_page.dart';
 import 'location_page.dart';
 import 'accelerometer_page.dart';
+import 'order_history_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isDarkMode;
@@ -108,24 +109,22 @@ class _ProfilePageState extends State<ProfilePage> {
                   // Management Group
                   _buildMenuCard([
                     _buildMenuItem(
-                      Icons.dashboard_outlined,
-                      "Edit profile information",
-                    ),
-                    _buildMenuItem(
-                      Icons.notifications_none,
-                      "Notifications",
-                      trailing: "ON",
-                    ),
-                    _buildMenuItem(
-                      Icons.translate,
-                      "Language",
-                      trailing: "English",
+                      Icons.shopping_bag_outlined,
+                      "Order History",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                OrderHistoryPage(isDarkMode: widget.isDarkMode),
+                          ),
+                        );
+                      },
                     ),
                   ]),
                   const SizedBox(height: 16),
                   // Settings Group
                   _buildMenuCard([
-                    _buildMenuItem(Icons.security, "Security"),
                     _buildMenuItem(
                       Icons.wb_sunny_outlined,
                       "Theme",
@@ -186,16 +185,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ]),
                   const SizedBox(height: 16),
-                  // Support Group
-                  _buildMenuCard([
-                    _buildMenuItem(Icons.help_outline, "Help & Support"),
-                    _buildMenuItem(Icons.chat_bubble_outline, "Contact us"),
-                    _buildMenuItem(
-                      Icons.privacy_tip_outlined,
-                      "Privacy policy",
-                    ),
-                  ]),
-                  const SizedBox(height: 16),
                   _buildLogoutButton(auth),
                   const SizedBox(height: 32),
                 ],
@@ -219,10 +208,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 shape: BoxShape.circle,
                 border: Border.all(color: Colors.black12, width: 2),
               ),
-              child: const CircleAvatar(
+              child: CircleAvatar(
                 radius: 60,
-                backgroundColor: Color(0xFFE1F5FE),
-                backgroundImage: AssetImage('assets/images/logo.png'),
+                backgroundColor: widget.isDarkMode
+                    ? Colors.grey[800]
+                    : Colors.grey[200],
+                child: Icon(
+                  Icons.person,
+                  size: 70,
+                  color: widget.isDarkMode ? Colors.white70 : Colors.grey[600],
+                ),
               ),
             ),
             Positioned(
