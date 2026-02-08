@@ -47,9 +47,14 @@ class _HomePageState extends State<HomePage> {
           : const Color(0xFFE8F0E6),
       appBar: AppBar(
         centerTitle: false,
-        title: const BrandLogo(height: 45),
+        title: const BrandLogo(height: 55),
         actions: [
-          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Standard search action
+            },
+          ),
           Stack(
             alignment: Alignment.center,
             children: [
@@ -92,6 +97,7 @@ class _HomePageState extends State<HomePage> {
               widget.onToggleTheme(isDarkMode);
             },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
@@ -235,12 +241,12 @@ class _HomePageState extends State<HomePage> {
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: isDarkMode ? Colors.grey[900] : Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 10,
-                        offset: Offset(0, 5),
+                        offset: const Offset(0, 5),
                       ),
                     ],
                   ),
@@ -261,9 +267,12 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Text(
                               cat['title'] as String,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87,
                               ),
                               maxLines: 1,
                             ),
@@ -352,7 +361,11 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 12),
           Text(
             title,
-            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+            style: TextStyle(
+              fontWeight: FontWeight.w900,
+              fontSize: 13,
+              color: isDarkMode ? Colors.white : Colors.black87,
+            ),
           ),
           const Text(
             "We have all the best products for your pet!",
@@ -383,21 +396,25 @@ class _HomePageState extends State<HomePage> {
                     Icon(
                       f['icon'] as IconData,
                       size: 28,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                     const SizedBox(height: 8),
                     Text(
                       f['title'] as String,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 8,
+                        color: isDarkMode ? Colors.white : Colors.black87,
                       ),
                     ),
-                    const Text(
+                    Text(
                       "Our support team is always ready.",
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 6, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 6,
+                        color: isDarkMode ? Colors.grey[400] : Colors.grey,
+                      ),
                     ),
                   ],
                 ),

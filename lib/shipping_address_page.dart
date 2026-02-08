@@ -43,7 +43,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
     final bgColor = widget.isDarkMode ? const Color(0xFF121212) : Colors.white;
     final appBarColor = widget.isDarkMode
         ? const Color(0xFF2C2C2C)
-        : const Color(0xFF2E7D32);
+        : const Color(0xFF477856);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -148,7 +148,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
                   onPressed: _saveAddress,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFC8E6C9), // Light green
-                    foregroundColor: const Color(0xFF2E7D32), // Dark green text
+                    foregroundColor: const Color(0xFF028A2B), // Dark green text
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -193,7 +193,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF2E7D32), width: 1),
+          borderSide: const BorderSide(color: Color(0xFF028A2B), width: 1),
         ),
       ),
       style: TextStyle(
@@ -225,8 +225,8 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
           height: 24,
           decoration: BoxDecoration(
             color: isComplete
-                ? const Color(0xFF2E7D32)
-                : (isActive ? const Color(0xFF2E7D32) : Colors.grey[300]),
+                ? const Color(0xFF028A2B)
+                : (isActive ? const Color(0xFF028A2B) : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: isComplete
@@ -247,7 +247,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isActive ? const Color(0xFF2E7D32) : Colors.grey,
+            color: isActive ? const Color(0xFF028A2B) : Colors.grey,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -259,7 +259,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
     return Expanded(
       child: Container(
         height: 2,
-        color: isActive ? const Color(0xFF2E7D32) : Colors.grey[300],
+        color: isActive ? const Color(0xFF028A2B) : Colors.grey[300],
         margin: const EdgeInsets.only(bottom: 20),
       ),
     );
@@ -273,7 +273,7 @@ class _ShippingAddressPageState extends State<ShippingAddressPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Shipping address saved"),
-          backgroundColor: Color(0xFF2E7D32),
+          backgroundColor: Color(0xFF028A2B),
         ),
       );
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'cart_manager.dart';
+import 'cart_page.dart' as pages;
+import 'widgets/brand_logo.dart';
 import 'network_status_page.dart';
 import 'battery_status_page.dart';
 import 'location_page.dart';
@@ -26,8 +29,72 @@ class _ProfilePageState extends State<ProfilePage> {
     final auth = Provider.of<AuthProvider>(context);
     final user = auth.currentUser;
 
+    final backgroundColor = widget.isDarkMode
+        ? const Color(0xFF121212) // Black background
+        : const Color(0xFFF1F8E9); // Light green theme
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F9),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        centerTitle: false,
+        title: const BrandLogo(height: 55),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Standard search action
+            },
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_bag_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => pages.CartPage(
+                        isDarkMode: widget.isDarkMode,
+                        onToggleTheme: widget.onToggleTheme,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Consumer<CartManager>(
+                builder: (context, cart, child) {
+                  return cart.totalItems > 0
+                      ? Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.orange,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              cart.totalItems.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox();
+                },
+              ),
+            ],
+          ),
+          IconButton(
+            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+            onPressed: () => widget.onToggleTheme(!widget.isDarkMode),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(), // Ensures smooth scrolling
         child: Column(
@@ -144,71 +211,47 @@ class _ProfilePageState extends State<ProfilePage> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.only(top: 60, bottom: 30),
-      decoration: const BoxDecoration(
-        color: Color(0xFF556B2F),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(30),
-          bottomRight: Radius.circular(30),
-        ),
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.blue.withOpacity(0.1),
-                    width: 8,
-                  ),
-                ),
-                child: const CircleAvatar(
-                  radius: 60,
-                  backgroundColor: Color(0xFFE1F5FE),
-                  backgroundImage: AssetImage('assets/images/logo.png'),
-                ),
+      child: Center(
+        child: Stack(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black12, width: 2),
               ),
-              Positioned(
-                bottom: 5,
-                right: 5,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.blueGrey,
-                  ),
-                ),
+              child: const CircleAvatar(
+                radius: 60,
+                backgroundColor: Color(0xFFE1F5FE),
+                backgroundImage: AssetImage('assets/images/logo.png'),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            user?.name ?? "Laiba Ahmar",
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "${user?.email ?? 'youremail@domain.com'} | +01 234 567 89",
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-        ],
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: widget.isDarkMode ? Colors.grey[850] : Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 24,
+                  color: Color(
+                    0xFF477856,
+                  ), // Using your brand green for the icon
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -216,7 +259,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildMenuCard(List<Widget> items) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: widget.isDarkMode ? Colors.grey[900] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -238,10 +281,17 @@ class _ProfilePageState extends State<ProfilePage> {
   }) {
     return ListTile(
       onTap: onTap,
-      leading: Icon(icon, color: Colors.black87, size: 22),
+      leading: Icon(
+        icon,
+        color: widget.isDarkMode ? Colors.white : Colors.black87,
+        size: 22,
+      ),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 16, color: Colors.black87),
+        style: TextStyle(
+          fontSize: 16,
+          color: widget.isDarkMode ? Colors.white : Colors.black87,
+        ),
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

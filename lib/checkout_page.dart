@@ -65,7 +65,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
     final accentColor = widget.isDarkMode
         ? Colors.greenAccent[700]!
-        : const Color(0xFF2E7D32);
+        : const Color(0xFF028A2B);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -155,7 +155,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: ListTile(
                   leading: const Icon(
                     Icons.shopping_bag_outlined,
-                    color: Color(0xFF2E7D32),
+                    color: Color(0xFF028A2B),
                   ),
                   title: Text(
                     item.name,
@@ -291,7 +291,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text("Order Placed Successfully!"),
-                      backgroundColor: Color(0xFF2E7D32),
+                      backgroundColor: Color(0xFF028A2B),
                     ),
                   );
 
@@ -349,7 +349,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: isSelected ? const Color(0xFF2E7D32) : Colors.grey,
+                      color: isSelected ? const Color(0xFF028A2B) : Colors.grey,
                       width: 2,
                     ),
                   ),
@@ -359,7 +359,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             width: 10,
                             height: 10,
                             decoration: const BoxDecoration(
-                              color: Color(0xFF2E7D32),
+                              color: Color(0xFF028A2B),
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -484,8 +484,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
           height: 24,
           decoration: BoxDecoration(
             color: isComplete
-                ? const Color(0xFF2E7D32)
-                : (isActive ? const Color(0xFF2E7D32) : Colors.grey[300]),
+                ? const Color(0xFF028A2B)
+                : (isActive ? const Color(0xFF028A2B) : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: isComplete
@@ -506,7 +506,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isActive ? const Color(0xFF2E7D32) : Colors.grey,
+            color: isActive ? const Color(0xFF028A2B) : Colors.grey,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -518,7 +518,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Expanded(
       child: Container(
         height: 2,
-        color: isActive ? const Color(0xFF2E7D32) : Colors.grey[300],
+        color: isActive ? const Color(0xFF028A2B) : Colors.grey[300],
         margin: const EdgeInsets.only(bottom: 20),
       ),
     );

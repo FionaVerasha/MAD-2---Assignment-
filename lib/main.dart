@@ -89,14 +89,14 @@ class _MyAppState extends State<MyApp> {
         0xFFF1F8E9,
       ), // Light green background
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF556B2F), // Olive Green
+        backgroundColor: Color(0xFF477856), // New Forest Green
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 1,
         centerTitle: false,
       ),
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF556B2F),
-        primary: const Color(0xFF556B2F),
+        seedColor: const Color(0xFF6B8E23),
+        primary: const Color(0xFF6B8E23),
       ),
     );
   }
@@ -107,7 +107,7 @@ class _MyAppState extends State<MyApp> {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: const Color(0xFF1B5E20), // Very dark green
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF1B5E20),
+        backgroundColor: Color(0xFF477856),
         foregroundColor: Colors.white,
       ),
       colorScheme: ColorScheme.fromSeed(

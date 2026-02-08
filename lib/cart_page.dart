@@ -29,7 +29,7 @@ class CartPage extends StatelessWidget {
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final accentColor = isDarkMode
         ? Colors.greenAccent[700]!
-        : const Color(0xFF2E7D32);
+        : const Color(0xFF028A2B);
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -290,8 +290,8 @@ class CartPage extends StatelessWidget {
           height: 24,
           decoration: BoxDecoration(
             color: isComplete
-                ? const Color(0xFF2E7D32)
-                : (isActive ? const Color(0xFF2E7D32) : Colors.grey[300]),
+                ? const Color(0xFF028A2B)
+                : (isActive ? const Color(0xFF028A2B) : Colors.grey[300]),
             shape: BoxShape.circle,
           ),
           child: isComplete
@@ -312,7 +312,7 @@ class CartPage extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: isActive ? const Color(0xFF2E7D32) : Colors.grey,
+            color: isActive ? const Color(0xFF028A2B) : Colors.grey,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -324,7 +324,7 @@ class CartPage extends StatelessWidget {
     return Expanded(
       child: Container(
         height: 2,
-        color: isActive ? const Color(0xFF2E7D32) : Colors.grey[300],
+        color: isActive ? const Color(0xFF028A2B) : Colors.grey[300],
         margin: const EdgeInsets.only(bottom: 20),
       ),
     );

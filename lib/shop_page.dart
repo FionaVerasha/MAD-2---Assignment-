@@ -5,8 +5,9 @@ import 'providers/product_provider.dart';
 import 'models/product.dart';
 import 'productdetail_page.dart';
 import 'widgets/product_image.dart';
-import 'widgets/cart_icon_button.dart';
 import 'widgets/brand_logo.dart';
+import 'widgets/category_drawer.dart';
+import 'cart_page.dart' as pages;
 
 class ShopPage extends StatefulWidget {
   final bool isDarkMode;
@@ -24,6 +25,8 @@ class ShopPage extends StatefulWidget {
 
 class _ShopPageState extends State<ShopPage> {
   String searchQuery = "";
+  String selectedCategory = "all";
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -39,7 +42,12 @@ class _ShopPageState extends State<ShopPage> {
   Widget build(BuildContext context) {
     final productProvider = Provider.of<ProductProvider>(context);
     final filteredProducts = productProvider.products.where((p) {
-      return p.name.toLowerCase().contains(searchQuery.toLowerCase());
+      final matchesSearch = p.name.toLowerCase().contains(
+        searchQuery.toLowerCase(),
+      );
+      final matchesCategory =
+          selectedCategory == "all" || p.category == selectedCategory;
+      return matchesSearch && matchesCategory;
     }).toList();
 
     final backgroundColor = widget.isDarkMode
@@ -47,31 +55,81 @@ class _ShopPageState extends State<ShopPage> {
         : const Color(0xFFF1F8E9);
 
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: backgroundColor,
+      drawer: CategoryDrawer(
+        selectedCategory: selectedCategory,
+        isDarkMode: widget.isDarkMode,
+        onCategorySelected: (category) {
+          setState(() {
+            selectedCategory = category;
+          });
+        },
+      ),
       appBar: AppBar(
-        title: Row(
-          children: [
-            const BrandLogo(height: 35),
-            const SizedBox(width: 10),
-            const Text(
-              "Whisker Shop",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () {
+            _scaffoldKey.currentState?.openDrawer();
+          },
         ),
+        centerTitle: false,
+        title: const BrandLogo(height: 55),
         actions: [
-          CartIconButton(
-            isDarkMode: widget.isDarkMode,
-            onToggleTheme: widget.onToggleTheme,
-          ),
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => productProvider.loadProducts(),
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              // Standard search action
+            },
+          ),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_bag_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => pages.CartPage(
+                        isDarkMode: widget.isDarkMode,
+                        onToggleTheme: widget.onToggleTheme,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              Consumer<CartManager>(
+                builder: (context, cart, child) {
+                  return cart.totalItems > 0
+                      ? Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.orange,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Text(
+                              cart.totalItems.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const SizedBox();
+                },
+              ),
+            ],
           ),
           IconButton(
             icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: () => widget.onToggleTheme(!widget.isDarkMode),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
@@ -234,7 +292,7 @@ class _ShopPageState extends State<ShopPage> {
             Text(
               "Rs. ${product.price.toStringAsFixed(2)}",
               style: const TextStyle(
-                color: Color(0xFF2E7D32),
+                color: Color(0xFF22C55E),
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),
@@ -260,13 +318,13 @@ class _ShopPageState extends State<ShopPage> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text("${product.name} added to cart!"),
-                        backgroundColor: const Color(0xFF2E7D32),
+                        backgroundColor: const Color(0xFF22C55E),
                         duration: const Duration(seconds: 1),
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2E7D32),
+                    backgroundColor: const Color(0xFF22C55E),
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.zero,
                     shape: RoundedRectangleBorder(

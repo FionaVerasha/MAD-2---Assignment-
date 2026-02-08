@@ -152,7 +152,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2E7D32),
+                      color: Color(0xFF22C55E),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -205,7 +205,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                             content: Text(
                               "${widget.product.name} Added to cart!",
                             ),
-                            backgroundColor: const Color(0xFF2E7D32),
+                            backgroundColor: const Color(0xFF22C55E),
                           ),
                         );
                         // Navigate to Review Order (CartPage)
@@ -220,7 +220,7 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2E7D32),
+                        backgroundColor: const Color(0xFF22C55E),
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -290,9 +290,9 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
         margin: const EdgeInsets.only(right: 12),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF2E7D32) : Colors.transparent,
+          color: isSelected ? const Color(0xFF22C55E) : Colors.transparent,
           border: Border.all(
-            color: isSelected ? const Color(0xFF2E7D32) : Colors.grey[300]!,
+            color: isSelected ? const Color(0xFF22C55E) : Colors.grey[300]!,
           ),
           borderRadius: BorderRadius.circular(8),
         ),
