@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'cart_manager.dart';
 import 'shipping_address_page.dart';
 import 'widgets/product_image.dart';
+import 'models/checkout_snapshot.dart';
+import 'services/checkout_storage.dart';
 
 class CartPage extends StatelessWidget {
   final bool isDarkMode;
@@ -222,7 +224,7 @@ class CartPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (cartManager.items.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -234,15 +236,25 @@ class CartPage extends StatelessWidget {
                           ),
                         );
                       } else {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ShippingAddressPage(
-                              isDarkMode: isDarkMode,
-                              onToggleTheme: onToggleTheme,
-                            ),
-                          ),
+                        // Create and save snapshot for local persistence
+                        final snapshot = CheckoutSnapshot(
+                          items: List.from(cartManager.items),
+                          totalAmount: cartManager.totalPrice,
+                          createdAt: DateTime.now(),
                         );
+                        await CheckoutStorage().saveSnapshot(snapshot);
+
+                        if (context.mounted) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ShippingAddressPage(
+                                isDarkMode: isDarkMode,
+                                onToggleTheme: onToggleTheme,
+                              ),
+                            ),
+                          );
+                        }
                       }
                     },
                     child: Text(

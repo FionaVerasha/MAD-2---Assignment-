@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'cart_manager.dart';
 import 'package:provider/provider.dart';
 import 'providers/checkout_provider.dart';
+import 'models/payment_method.dart';
+import 'payment_page.dart';
+import 'models/checkout_snapshot.dart';
+import 'services/checkout_storage.dart';
 
-class CheckoutPage extends StatelessWidget {
+class CheckoutPage extends StatefulWidget {
   final bool isDarkMode;
   final Function(bool) onToggleTheme;
 
@@ -14,20 +18,54 @@ class CheckoutPage extends StatelessWidget {
   });
 
   @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
+
+class _CheckoutPageState extends State<CheckoutPage> {
+  CheckoutSnapshot? _snapshot;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSnapshot();
+  }
+
+  Future<void> _loadSnapshot() async {
+    final snapshot = await CheckoutStorage().loadSnapshot();
+    if (mounted) {
+      setState(() {
+        _snapshot = snapshot;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final cartManager = Provider.of<CartManager>(context);
     final checkoutProvider = Provider.of<CheckoutProvider>(context);
     final address = checkoutProvider.address;
 
-    final backgroundColor = isDarkMode
+    // Use snapshot items if available, else fallback to cartManager (live cart)
+    final items = _snapshot?.items ?? cartManager.items;
+    final totalPrice = _snapshot?.totalAmount ?? cartManager.totalPrice;
+
+    final backgroundColor = widget.isDarkMode
         ? const Color(0xFF121212)
         : Colors.grey[200];
-    final cardColor = isDarkMode ? const Color(0xFF1E1E1E) : Colors.white;
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final appBarColor = isDarkMode
+    final cardColor = widget.isDarkMode
+        ? const Color(0xFF1E1E1E)
+        : Colors.white;
+    final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
+    final appBarColor = widget.isDarkMode
         ? const Color(0xFF2C2C2C)
         : const Color(0xFF2E7D32);
-    final accentColor = isDarkMode
+    final accentColor = widget.isDarkMode
         ? Colors.greenAccent[700]!
         : const Color(0xFF2E7D32);
 
@@ -106,7 +144,7 @@ class CheckoutPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            ...cartManager.items.map((item) {
+            ...items.map((item) {
               return Card(
                 color: cardColor,
                 margin: const EdgeInsets.only(bottom: 8),
@@ -158,12 +196,72 @@ class CheckoutPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Rs. ${cartManager.totalPrice.toStringAsFixed(2)}",
+                    "Rs. ${totalPrice.toStringAsFixed(2)}",
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              "PAYMENT",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "ALL TRANSACTIONS ARE SECURE AND ENCRYPTED.",
+              style: TextStyle(
+                fontSize: 10,
+                color: textColor.withOpacity(0.5),
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  _buildPaymentOption(
+                    context,
+                    method: PaymentMethod.cod,
+                    title: "Cash on Delivery",
+                    subtitle: "PAY WHEN YOU RECEIVE YOUR ORDER",
+                    icon: Icons.money,
+                    checkoutProvider: checkoutProvider,
+                    textColor: textColor,
+                  ),
+                  const Divider(height: 1),
+                  _buildPaymentOption(
+                    context,
+                    method: PaymentMethod.card,
+                    title: "Bank Card / Bank Account – PayHere",
+                    subtitle: "PAY USING CREDIT/DEBIT CARD",
+                    icon: Icons.credit_card,
+                    checkoutProvider: checkoutProvider,
+                    textColor: textColor,
+                  ),
+                  const Divider(height: 1),
+                  _buildPaymentOption(
+                    context,
+                    method: PaymentMethod.bankDeposit,
+                    title: "Bank Deposit",
+                    subtitle: "TRANSFER FUNDS DIRECTLY TO OUR BANK ACCOUNT",
+                    icon: Icons.account_balance,
+                    checkoutProvider: checkoutProvider,
+                    textColor: textColor,
                   ),
                 ],
               ),
@@ -179,18 +277,35 @@ class CheckoutPage extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text("Order Placed Successfully!"),
-                    backgroundColor: Color(0xFF2E7D32),
-                  ),
-                );
-                Future.delayed(const Duration(seconds: 2), () {
+              onPressed: () async {
+                // Stripe dialog appears ONLY when pressing Place Order with Card payment selected
+                if (checkoutProvider.selectedPaymentMethod ==
+                    PaymentMethod.card) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PaymentPage()),
+                  );
+                } else {
+                  // COD or Bank Deposit flow
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Order Placed Successfully!"),
+                      backgroundColor: Color(0xFF2E7D32),
+                    ),
+                  );
+
+                  // Cleanup
+                  await CheckoutStorage().clearSnapshot();
+                  await checkoutProvider.reset();
                   cartManager.clearCart();
-                  // Back to home/shop
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                });
+
+                  if (mounted) {
+                    Future.delayed(const Duration(seconds: 2), () {
+                      // Back to home/shop
+                      Navigator.of(context).popUntil((route) => route.isFirst);
+                    });
+                  }
+                }
               },
               child: const Text(
                 "Place Order",
@@ -204,6 +319,147 @@ class CheckoutPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPaymentOption(
+    BuildContext context, {
+    required PaymentMethod method,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required CheckoutProvider checkoutProvider,
+    required Color textColor,
+  }) {
+    final isSelected = checkoutProvider.selectedPaymentMethod == method;
+    final isCard = method == PaymentMethod.card;
+
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => checkoutProvider.setPaymentMethod(method),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: isSelected ? const Color(0xFF2E7D32) : Colors.grey,
+                      width: 2,
+                    ),
+                  ),
+                  child: isSelected
+                      ? Center(
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF2E7D32),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: textColor,
+                        ),
+                      ),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: textColor.withOpacity(0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // Show tiny card placeholders for Stripe option
+                if (isCard)
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.credit_card,
+                        color: Colors.grey[400],
+                        size: 16,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        "Visa/Master",
+                        style: TextStyle(fontSize: 8, color: Colors.grey[400]),
+                      ),
+                    ],
+                  )
+                else
+                  Icon(icon, color: Colors.grey[400], size: 24),
+              ],
+            ),
+          ),
+        ),
+        // Conditional Redirect Info Panel
+        if (isCard)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: isSelected
+                ? Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20,
+                      horizontal: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: widget.isDarkMode
+                          ? Colors.grey[900]
+                          : Colors.grey[50],
+                      border: Border(
+                        top: BorderSide(
+                          color: widget.isDarkMode
+                              ? Colors.black
+                              : Colors.grey[200]!,
+                        ),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.credit_card_outlined,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          "You’ll be redirected to Stripe to safely\ncomplete your purchase using your bank card.",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: widget.isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox(width: double.infinity, height: 0),
+          ),
+      ],
     );
   }
 
