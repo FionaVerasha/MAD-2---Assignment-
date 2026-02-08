@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'network_status_page.dart';
+import 'battery_status_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isDarkMode;
@@ -75,6 +76,18 @@ class _ProfilePageState extends State<ProfilePage> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const NetworkStatusPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      Icons.battery_full,
+                      "Battery Status",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BatteryStatusPage(),
                           ),
                         );
                       },
