@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'cart_manager.dart';
 import 'shipping_address_page.dart';
 import 'widgets/product_image.dart';
+import 'widgets/brand_logo.dart';
 import 'models/checkout_snapshot.dart';
 import 'services/checkout_storage.dart';
 
@@ -29,29 +30,24 @@ class CartPage extends StatelessWidget {
     final accentColor = isDarkMode
         ? Colors.greenAccent[700]!
         : const Color(0xFF2E7D32);
-    final appBarColor = isDarkMode
-        ? const Color(0xFF1B5E20)
-        : const Color(0xFF2E7D32);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: Text(
-          "Your Cart",
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        title: Row(
+          children: [
+            const BrandLogo(height: 35),
+            const SizedBox(width: 10),
+            const Text(
+              "Your Cart",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        backgroundColor: appBarColor,
-        centerTitle: true,
         actions: [
           //Theme toggle button
           IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: Colors.white,
-            ),
+            icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
             tooltip: isDarkMode
                 ? "Switch to Light Mode"
                 : "Switch to Dark Mode",
@@ -232,7 +228,9 @@ class CartPage extends StatelessWidget {
                               "Your cart is empty!",
                               style: TextStyle(color: textColor),
                             ),
-                            backgroundColor: appBarColor,
+                            backgroundColor: Theme.of(
+                              context,
+                            ).appBarTheme.backgroundColor,
                           ),
                         );
                       } else {

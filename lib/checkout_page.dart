@@ -6,6 +6,7 @@ import 'models/payment_method.dart';
 import 'payment_page.dart';
 import 'models/checkout_snapshot.dart';
 import 'services/checkout_storage.dart';
+import 'widgets/brand_logo.dart';
 
 class CheckoutPage extends StatefulWidget {
   final bool isDarkMode;
@@ -62,9 +63,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
         ? const Color(0xFF1E1E1E)
         : Colors.white;
     final textColor = widget.isDarkMode ? Colors.white : Colors.black87;
-    final appBarColor = widget.isDarkMode
-        ? const Color(0xFF2C2C2C)
-        : const Color(0xFF2E7D32);
     final accentColor = widget.isDarkMode
         ? Colors.greenAccent[700]!
         : const Color(0xFF2E7D32);
@@ -72,13 +70,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text(
-          "Confirm Order",
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Row(
+          children: [
+            const BrandLogo(height: 35),
+            const SizedBox(width: 10),
+            const Text(
+              "Confirm Order",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        backgroundColor: appBarColor,
-        centerTitle: true,
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

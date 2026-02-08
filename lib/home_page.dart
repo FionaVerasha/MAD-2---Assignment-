@@ -7,6 +7,7 @@ import 'providers/product_provider.dart';
 import 'models/product.dart';
 import 'productdetail_page.dart';
 import 'widgets/product_image.dart';
+import 'widgets/brand_logo.dart';
 
 class HomePage extends StatefulWidget {
   final bool isDarkMode;
@@ -29,7 +30,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     isDarkMode = widget.isDarkMode;
-    // Load products on start
     Future.microtask(() {
       if (!mounted) return;
       Provider.of<ProductProvider>(context, listen: false).loadProducts();
@@ -41,60 +41,27 @@ class _HomePageState extends State<HomePage> {
     final cart = Provider.of<CartManager>(context);
     final productProvider = Provider.of<ProductProvider>(context);
 
-    final backgroundColor = isDarkMode
-        ? const Color(0xFF121212)
-        : Colors.grey[300];
-    final textColor = isDarkMode ? Colors.white : Colors.black87;
-    final accentColor = isDarkMode
-        ? Colors.tealAccent[700]!
-        : const Color(0xFF2E7D32);
-    final appBarColor = isDarkMode
-        ? const Color(0xFF1B5E20)
-        : const Color(0xFF2E7D32);
-
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: isDarkMode
+          ? const Color(0xFF121212)
+          : const Color(0xFFE8F0E6),
       appBar: AppBar(
-        backgroundColor: appBarColor,
-        elevation: 3,
-        title: const Text(
-          "Whisker Cart",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        centerTitle: false,
+        title: const BrandLogo(height: 45),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => ShopPage(
-                    isDarkMode: isDarkMode,
-                    onToggleTheme: widget.onToggleTheme,
-                  ),
-                ),
-              );
-            },
-          ),
+          IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           Stack(
             alignment: Alignment.center,
             children: [
               IconButton(
-                icon: const Icon(
-                  Icons.shopping_cart_outlined,
-                  color: Colors.white,
-                ),
+                icon: const Icon(Icons.shopping_bag_outlined),
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => pages.CartPage(
                         isDarkMode: isDarkMode,
-                        onToggleTheme: (value) {
-                          setState(() => isDarkMode = value);
-                          widget.onToggleTheme(value);
-                        },
+                        onToggleTheme: widget.onToggleTheme,
                       ),
                     ),
                   );
@@ -102,12 +69,12 @@ class _HomePageState extends State<HomePage> {
               ),
               if (cart.totalItems > 0)
                 Positioned(
-                  right: 6,
-                  top: 6,
+                  right: 8,
+                  top: 8,
                   child: Container(
                     padding: const EdgeInsets.all(4),
                     decoration: const BoxDecoration(
-                      color: Colors.redAccent,
+                      color: Colors.orange,
                       shape: BoxShape.circle,
                     ),
                     child: Text(
@@ -119,10 +86,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           IconButton(
-            icon: Icon(
-              isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: Colors.white,
-            ),
+            icon: Icon(isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: () {
               setState(() => isDarkMode = !isDarkMode);
               widget.onToggleTheme(isDarkMode);
@@ -132,302 +96,412 @@ class _HomePageState extends State<HomePage> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hero Section
-            _buildHero(textColor, accentColor),
+            // Hero Section (Diagonal Split)
+            _buildHero(),
 
-            // Best Sellers (From API)
-            _buildProductSection(
-              "Best Sellers",
+            // Category Quick Selection
+            _buildCategoryQuickSection(),
+
+            // Proper Pet Care / Accessories Banners
+            _buildDoubleBanners(),
+
+            // Trust Icons
+            _buildTrustSection(),
+
+            // Get 20% Off Products
+            _buildProductGridSection(
+              "GET 20% OFF",
               productProvider.products.take(4).toList(),
               productProvider.isLoading,
             ),
 
-            // Categories (Statics)
-            _buildCategorySection(),
-
-            // New Arrivals (From API)
-            _buildProductSection(
-              "New Arrivals",
-              productProvider.products.reversed.take(4).toList(),
-              productProvider.isLoading,
-            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHero(Color textColor, Color accentColor) {
-    return Stack(
-      children: [
-        Image.asset(
-          'assets/images/main.jpg',
-          width: double.infinity,
-          height: 220,
-          fit: BoxFit.cover,
-          color: isDarkMode ? Colors.black.withOpacity(0.6) : null,
-          colorBlendMode: isDarkMode ? BlendMode.darken : null,
-        ),
-        Positioned.fill(
-          child: Center(
+  Widget _buildHero() {
+    return Container(
+      height: 300,
+      width: double.infinity,
+      child: Stack(
+        children: [
+          // Full Background Image (Puppy and Kitten)
+          Positioned.fill(
+            child: Image.network(
+              'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Dark Overlay for text readability
+          Positioned.fill(
+            child: Container(color: Colors.black.withOpacity(0.3)),
+          ),
+          // Text Content
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Find the Best Pet Products",
+                const Text(
+                  "All Products",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  "Shop for your furry friend with ease",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                const SizedBox(height: 8),
+                const Text(
+                  "Save 50% Off",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 36,
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-                const SizedBox(height: 15),
+                const Text(
+                  "Happy Pet, Happy You",
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+                const SizedBox(height: 20),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 12,
-                    ),
-                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ShopPage(
+                        builder: (_) => ShopPage(
                           isDarkMode: isDarkMode,
                           onToggleTheme: widget.onToggleTheme,
                         ),
                       ),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
                   child: const Text(
-                    "Shop Now",
-                    style: TextStyle(color: Colors.white),
+                    "SHOP NOW",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildProductSection(
-    String title,
-    List<Product> products,
-    bool isLoading,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 15),
-          if (isLoading)
-            const Center(
-              child: CircularProgressIndicator(color: Color(0xFF2E7D32)),
-            )
-          else if (products.isEmpty)
-            Center(
-              child: Text(
-                "No products available",
-                style: TextStyle(
-                  color: isDarkMode ? Colors.grey : Colors.black54,
-                ),
-              ),
-            )
-          else
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 0.75,
-              ),
-              itemCount: products.length,
-              itemBuilder: (context, index) =>
-                  _buildProductCard(products[index]),
-            ),
         ],
       ),
     );
   }
 
-  Widget _buildProductCard(Product product) {
-    return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => ProductDetailPage(
-            product: product,
-            isDarkMode: isDarkMode,
-            onToggleTheme: widget.onToggleTheme,
-          ),
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: const [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(4.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: ProductImage(
-                        url: product.imageUrl,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProductDetailPage(
-                              product: product,
-                              isDarkMode: isDarkMode,
-                              onToggleTheme: widget.onToggleTheme,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  Text(
-                    "Rs. ${product.price.toStringAsFixed(2)}",
-                    style: const TextStyle(
-                      color: Color(0xFF2E7D32),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategorySection() {
+  Widget _buildCategoryQuickSection() {
     final categories = [
-      {"name": "Dogs", "image": "assets/images/dogs.png"},
-      {"name": "Cats", "image": "assets/images/cats.png"},
-      {"name": "Accessories", "image": "assets/images/accessories.png"},
-      {"name": "Grooming", "image": "assets/images/grooming.png"},
+      {
+        "title": "Dog Supplies",
+        "image":
+            "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=300&q=80",
+        "color": Color(0xFFB3D9EA),
+      },
+      {
+        "title": "Cat Supplies",
+        "image":
+            "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=300&q=80",
+        "color": Color(0xFFF7B9BA),
+      },
+      {
+        "title": "Other Utensils",
+        "image":
+            "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=300&q=80",
+        "color": Color(0xFFF9D199),
+      },
     ];
 
-    return Container(
-      color: isDarkMode
-          ? const Color(0xFF2C2C2C)
-          : const Color.fromARGB(255, 232, 234, 246),
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Featured Categories",
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 15),
-          SizedBox(
-            height: 120,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ShopPage(
-                      isDarkMode: isDarkMode,
-                      onToggleTheme: widget.onToggleTheme,
-                    ),
-                  ),
-                ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30, horizontal: 10),
+      child: Row(
+        children: categories
+            .map(
+              (cat) => Expanded(
                 child: Container(
-                  width: 100,
-                  margin: const EdgeInsets.only(right: 15),
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: Offset(0, 5),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundImage: AssetImage(
-                          categories[index]["image"]!,
+                      Container(
+                        height: 120,
+                        width: double.infinity,
+                        color: cat['color'] as Color,
+                        child: Image.network(
+                          cat['image'] as String,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        categories[index]["name"]!,
-                        style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          color: isDarkMode ? Colors.white : Colors.black87,
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          children: [
+                            Text(
+                              cat['title'] as String,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                              maxLines: 1,
+                            ),
+                            const Text(
+                              "Flea & Tick, Health etc.",
+                              style: TextStyle(fontSize: 9, color: Colors.grey),
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ShopPage(
+                                      isDarkMode: isDarkMode,
+                                      onToggleTheme: widget.onToggleTheme,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14,
+                                ),
+                                minimumSize: const Size(0, 24),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                              child: const Text(
+                                "SHOP NOW",
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildDoubleBanners() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        children: [
+          _buildWideBanner(
+            "PROPER PET CARE",
+            "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=300&q=80",
+          ),
+          const SizedBox(width: 15),
+          _buildWideBanner(
+            "PET ACCESSORIES",
+            "https://images.unsplash.com/photo-1544568100-847a948585b9?auto=format&fit=crop&w=300&q=80",
           ),
         ],
       ),
     );
   }
+
+  Widget _buildWideBanner(String title, String imageUrl) {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            height: 150,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(imageUrl),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
+          ),
+          const Text(
+            "We have all the best products for your pet!",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 10, color: Colors.grey),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrustSection() {
+    final features = [
+      {"icon": Icons.headset_mic_outlined, "title": "24/7 FRIENDLY SUPPORT"},
+      {"icon": Icons.local_shipping_outlined, "title": "FREE SHIPPING"},
+      {"icon": Icons.assignment_return_outlined, "title": "7 DAYS EASY RETURN"},
+      {"icon": Icons.verified_user_outlined, "title": "QUALITY GUARANTEED"},
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 10),
+      child: Row(
+        children: features
+            .map(
+              (f) => Expanded(
+                child: Column(
+                  children: [
+                    Icon(
+                      f['icon'] as IconData,
+                      size: 28,
+                      color: Colors.black87,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      f['title'] as String,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 8,
+                      ),
+                    ),
+                    const Text(
+                      "Our support team is always ready.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 6, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+
+  Widget _buildProductGridSection(
+    String title,
+    List<Product> products,
+    bool isLoading,
+  ) {
+    return Column(
+      children: [
+        const Text(
+          "GET 20% OFF",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 12,
+            letterSpacing: 2,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Row(
+            children: products
+                .take(4)
+                .map(
+                  (p) => Expanded(
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProductDetailPage(
+                              product: p,
+                              isDarkMode: isDarkMode,
+                              onToggleTheme: widget.onToggleTheme,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              color: Colors.grey[100],
+                              height: 100,
+                              child: ProductImage(url: p.imageUrl),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              p.name,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class HeroDiagonalPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final bluePaint = Paint()..color = const Color(0xFF5BA7C8);
+    final orangePaint = Paint()..color = const Color(0xFFF9B87A);
+
+    // Draw blue background half
+    final bluePath = Path();
+    bluePath.moveTo(0, 0);
+    bluePath.lineTo(size.width * 0.6, 0);
+    bluePath.lineTo(size.width * 0.4, size.height);
+    bluePath.lineTo(0, size.height);
+    bluePath.close();
+    canvas.drawPath(bluePath, bluePaint);
+
+    // Draw orange background half
+    final orangePath = Path();
+    orangePath.moveTo(size.width * 0.6, 0);
+    orangePath.lineTo(size.width, 0);
+    orangePath.lineTo(size.width, size.height);
+    orangePath.lineTo(size.width * 0.4, size.height);
+    orangePath.close();
+    canvas.drawPath(orangePath, orangePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

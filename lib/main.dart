@@ -89,10 +89,15 @@ class _MyAppState extends State<MyApp> {
         0xFFF1F8E9,
       ), // Light green background
       appBarTheme: const AppBarTheme(
-        backgroundColor: Color(0xFF2E7D32), // Dark green
+        backgroundColor: Color(0xFF556B2F), // Olive Green
         foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
       ),
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF556B2F),
+        primary: const Color(0xFF556B2F),
+      ),
     );
   }
 

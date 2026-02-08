@@ -6,6 +6,7 @@ import 'models/product.dart';
 import 'productdetail_page.dart';
 import 'widgets/product_image.dart';
 import 'widgets/cart_icon_button.dart';
+import 'widgets/brand_logo.dart';
 
 class ShopPage extends StatefulWidget {
   final bool isDarkMode;
@@ -44,34 +45,31 @@ class _ShopPageState extends State<ShopPage> {
     final backgroundColor = widget.isDarkMode
         ? const Color(0xFF121212)
         : const Color(0xFFF1F8E9);
-    final appBarColor = widget.isDarkMode
-        ? const Color(0xFF1B5E20)
-        : const Color(0xFF2E7D32);
 
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: appBarColor,
-        elevation: 0,
-        title: const Text(
-          "Whisker Shop",
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        title: Row(
+          children: [
+            const BrandLogo(height: 35),
+            const SizedBox(width: 10),
+            const Text(
+              "Whisker Shop",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        centerTitle: true,
         actions: [
           CartIconButton(
             isDarkMode: widget.isDarkMode,
             onToggleTheme: widget.onToggleTheme,
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh),
             onPressed: () => productProvider.loadProducts(),
           ),
           IconButton(
-            icon: Icon(
-              widget.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-              color: Colors.white,
-            ),
+            icon: Icon(widget.isDarkMode ? Icons.light_mode : Icons.dark_mode),
             onPressed: () => widget.onToggleTheme(!widget.isDarkMode),
           ),
         ],

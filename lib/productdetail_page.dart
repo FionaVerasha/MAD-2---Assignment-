@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'models/product.dart';
 import 'cart_manager.dart';
 import 'widgets/product_image.dart';
+import 'widgets/brand_logo.dart';
 import 'cart_page.dart';
 
 // MAD2 Requirement: Redesigned Detail View with interactive Variants and Pricing
@@ -53,19 +54,22 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
     return Scaffold(
       backgroundColor: bgColor,
       appBar: AppBar(
-        title: Text(
-          widget.product.name,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+        title: Row(
+          children: [
+            const BrandLogo(height: 35),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                widget.product.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: widget.isDarkMode
-            ? const Color(0xFF1B5E20)
-            : const Color(0xFF2E7D32),
-        elevation: 0,
       ),
       body: SingleChildScrollView(
         child: Column(
