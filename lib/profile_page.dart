@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'network_status_page.dart';
 import 'battery_status_page.dart';
+import 'location_page.dart';
+import 'accelerometer_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isDarkMode;
@@ -27,6 +29,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F9),
       body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(), // Ensures smooth scrolling
         child: Column(
           children: [
             _buildHeader(user),
@@ -34,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
+                  const SizedBox(height: 16),
+                  // Management Group
                   _buildMenuCard([
                     _buildMenuItem(
                       Icons.dashboard_outlined,
@@ -51,6 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ]),
                   const SizedBox(height: 16),
+                  // Settings Group
                   _buildMenuCard([
                     _buildMenuItem(Icons.security, "Security"),
                     _buildMenuItem(
@@ -61,13 +67,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ]),
                   const SizedBox(height: 16),
+                  // Monitor/Capability Group (Requested order)
                   _buildMenuCard([
-                    _buildMenuItem(Icons.help_outline, "Help & Support"),
-                    _buildMenuItem(Icons.chat_bubble_outline, "Contact us"),
-                    _buildMenuItem(
-                      Icons.privacy_tip_outlined,
-                      "Privacy policy",
-                    ),
                     _buildMenuItem(
                       Icons.wifi,
                       "Network Status",
@@ -91,6 +92,40 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         );
                       },
+                    ),
+                    _buildMenuItem(
+                      Icons.location_on_outlined,
+                      "Location (GPS)",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LocationPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      Icons.sensors,
+                      "Accelerometer",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const AccelerometerPage(),
+                          ),
+                        );
+                      },
+                    ),
+                  ]),
+                  const SizedBox(height: 16),
+                  // Support Group
+                  _buildMenuCard([
+                    _buildMenuItem(Icons.help_outline, "Help & Support"),
+                    _buildMenuItem(Icons.chat_bubble_outline, "Contact us"),
+                    _buildMenuItem(
+                      Icons.privacy_tip_outlined,
+                      "Privacy policy",
                     ),
                   ]),
                   const SizedBox(height: 16),
@@ -131,9 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: const CircleAvatar(
                   radius: 60,
                   backgroundColor: Color(0xFFE1F5FE),
-                  backgroundImage: AssetImage(
-                    'assets/images/logo.png',
-                  ), // Using logo as fallback
+                  backgroundImage: AssetImage('assets/images/logo.png'),
                 ),
               ),
               Positioned(
